@@ -1,0 +1,13 @@
+com\example\middleearth\infraestructura\DatabaseConnection.class
+com\example\middleearth\dominio\HumanoStrategy.class
+com\example\middleearth\aplicacion\IPersonajeRepository.class
+com\example\middleearth\infraestructura\MysqlPersonajeRepository.class
+com\example\middleearth\dominio\ElfoStrategy.class
+com\example\middleearth\dominio\HobbitStrategy.class
+com\example\middleearth\dominio\EnanoStrategy.class
+com\example\middleearth\aplicacion\PersonajeService.class
+com\example\middleearth\dominio\RazaStrategy.class
+com\example\middleearth\dominio\Atributos.class
+com\example\middleearth\infraestructura\CharacterFactory.class
+com\example\middleearth\MiddleearthApplication.class
+com\example\middleearth\dominio\Personaje.class
