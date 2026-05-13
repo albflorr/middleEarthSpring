@@ -22,27 +22,26 @@ public class MysqlPersonajeRepository implements IPersonajeRepository {
 
     @Override
     public void guardar(Personaje p) {
-        String sql = "INSERT INTO personajes (nombre, raza, habilidad_especial,fuerza,agilidad,sigilo,valor) "
-                + "VALUES (?, ?, ?,?,?,?,?)";
-        
-        try (java.sql.Connection conn = DatabaseConnection.getInstance();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, p.getNombre());
-            ps.setString(2, p.getTipoRaza());
-            ps.setString(3, p.getEstrategia().getHabilidadEspecial());
-            ps.setString(4, String.valueOf(p.getAtributos().getFuerza()));
-            ps.setString(5, String.valueOf(p.getAtributos().getAgilidad()));
-            ps.setString(6, String.valueOf(p.getAtributos().getSigilo()));
-            ps.setString(7, String.valueOf(p.getAtributos().getValor()));
+String sql = "INSERT INTO personajes (nombre, raza, tipo_raza, habilidad_especial,fuerza,agilidad,sigilo,valor) "
+        + "VALUES (?, ?, ?,?,?,?,?,?)";
 
-            
-            ps.executeUpdate();
-            System.out.println("Personaje guardado en base de datos correctamente.");
-            
+        try {
+            java.sql.Connection conn = DatabaseConnection.getInstance();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, p.getNombre());
+                ps.setString(2, p.getTipoRaza());
+                ps.setString(3, p.getTipoRaza());
+                ps.setString(4, p.getEstrategia().getHabilidadEspecial());
+                ps.setInt(5, p.getAtributos().getFuerza());
+                ps.setInt(6, p.getAtributos().getAgilidad());
+                ps.setInt(7, p.getAtributos().getSigilo());
+                ps.setInt(8, p.getAtributos().getValor());
+                ps.executeUpdate();
+                System.out.println("Personaje guardado en base de datos correctamente.");
+            }
         } catch (SQLException e) {
             System.err.println("Error al persistir personaje: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Error al guardar personaje en BD", e);
         }
     }
 
@@ -51,24 +50,35 @@ public class MysqlPersonajeRepository implements IPersonajeRepository {
         List<Personaje> lista = new ArrayList<>();
         String sql = "SELECT * FROM personajes";
 
-        try (java.sql.Connection conn = DatabaseConnection.getInstance();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        try {
+            java.sql.Connection conn = DatabaseConnection.getInstance();
+            try (Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery(sql)) {
 
-            while (rs.next()) {
-                String nombre = rs.getString("nombre");
-                String raza = rs.getString("raza");
-                
-                // Reconstrucción del objeto de dominio usando la Factoría [4]
-                RazaStrategy estrategia = CharacterFactory.getStrategy(raza);
-                Personaje p = new Personaje(nombre, raza, estrategia);
-                p.aplicarBonosRaza(); // Restauramos su estado lógico
-                
-                lista.add(p);
+                while (rs.next()) {
+                    String nombre = rs.getString("nombre");
+                    String raza = rs.getString("raza");
+
+                    if (raza == null || raza.isBlank()) continue;
+
+                    int fuerza = rs.getInt("fuerza");
+                    int agilidad = rs.getInt("agilidad");
+                    int sigilo = rs.getInt("sigilo");
+                    int valor = rs.getInt("valor");
+
+                    RazaStrategy estrategia = CharacterFactory.getStrategy(raza);
+                    Personaje p = new Personaje(nombre, raza, estrategia);
+                    p.getAtributos().setFuerza(fuerza);
+                    p.getAtributos().setAgilidad(agilidad);
+                    p.getAtributos().setSigilo(sigilo);
+                    p.getAtributos().setValor(valor);
+
+                    lista.add(p);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al listar personajes: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Error al listar personajes de BD", e);
         }
         return lista;
     }

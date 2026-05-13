@@ -21,7 +21,7 @@ public class PersonajeService {
         this.repository = repository;
     }
 
-    public void crearHeroe(String nombre, String tipoRaza) {
+    public Personaje crearHeroe(String nombre, String tipoRaza) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new RuntimeException("El nombre del héroe es obligatorio.");
         }
@@ -31,6 +31,7 @@ public class PersonajeService {
         repository.guardar(nuevoHeroe);
      
         System.out.println("Héroe " + nombre + " forjado y guardado correctamente.");
+        return nuevoHeroe;
     }
 
     public List<Personaje> listarHeroes() {

@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:9090';
+const API_BASE = 'http://localhost:9091';
 
 // Cargar lista al iniciar
 document.addEventListener('DOMContentLoaded', function() {
@@ -19,7 +19,7 @@ document.getElementById('formPersonaje').addEventListener('submit', function(e) 
     fetch(`${API_BASE}/generar`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
             nombre: nombre, 
