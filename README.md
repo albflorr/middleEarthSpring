@@ -1,0 +1,169 @@
+# Middle Earth - Forja tu Leyenda
+
+Aplicación Spring Boot para crear y gestionar héroes de la Tierra Media, con bonos de atributos según su raza.
+
+## Stack tecnológico
+
+| Componente | Versión |
+|---|---|
+| Java | 17 |
+| Spring Boot | 4.0.6 |
+| MySQL | 8+ (connector mysql-connector-j) |
+| Frontend | HTML + CSS + JS vanilla |
+| Build | Maven |
+
+## Requisitos previos
+
+- JDK 17
+- MySQL 8+ corriendo en `localhost:3306`
+- Maven (incluido en NetBeans o instalado por separado)
+
+## Base de datos
+
+Crear la base de datos y tabla:
+
+```sql
+CREATE DATABASE lotr_db;
+
+USE lotr_db;
+
+CREATE TABLE personajes (
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    raza VARCHAR(50) NOT NULL,
+    tipo_raza VARCHAR(255) NOT NULL,
+    habilidad_especial VARCHAR(255),
+    fuerza INT(11) DEFAULT 10,
+    agilidad INT(11) DEFAULT 10,
+    sigilo INT(11) DEFAULT 10,
+    valor INT(11) DEFAULT 10,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+```
+
+## Configuración
+
+`src/main/resources/application.properties`:
+
+```properties
+server.port=9091
+spring.application.name=middleearth
+spring.datasource.url=jdbc:mysql://localhost:3306/lotr_db
+spring.datasource.username=root
+spring.datasource.password=
+```
+
+Ajusta usuario/contraseña según tu MySQL.
+
+## Ejecución
+
+```bash
+# Desde NetBeans: botón Run (play)
+# O desde terminal:
+mvn spring-boot:run
+```
+
+La aplicación arranca en `http://localhost:9091`.
+
+## Arquitectura
+
+```
+src/main/java/com/example/middleearth/
+├── MiddleearthApplication.java     # Main + REST Controller
+├── aplicacion/                     # Casos de uso (servicios)
+│   ├── IPersonajeRepository.java   # Puerto de salida (interfaz repositorio)
+│   ├── PersonajeService.java       # Servicio: crear y listar héroes
+│   └── PersonajeDTO.java           # DTO para petición POST
+├── dominio/                        # Núcleo del negocio
+│   ├── Personaje.java              # Entidad personaje
+│   ├── Atributos.java              # Value Object (fuerza, agilidad, sigilo, valor)
+│   ├── RazaStrategy.java           # Interface Strategy
+│   ├── HumanoStrategy.java         # +15 Valor
+│   ├── HobbitStrategy.java         # +15 Sigilo, +10 Valor
+│   ├── EnanoStrategy.java          # +15 Valor, +25 Fuerza
+│   └── ElfoStrategy.java           # +25 Sigilo, +15 Agilidad
+└── infraestructura/                # Adaptadores técnicos
+    ├── CharacterFactory.java       # Simple Factory (crea RazaStrategy según raza)
+    ├── DatabaseConnection.java     # Singleton de conexión JDBC
+    └── MysqlPersonajeRepository.java # Implementación del repositorio (JDBC puro)
+
+src/main/resources/static/
+├── index.html                      # Página principal
+├── css/style.css                   # Estilos
+└── js/app.js                       # JS cliente (fetch API)
+```
+
+### Patrones de diseño
+
+| Patrón | Implementación |
+|---|---|
+| **Strategy** | `RazaStrategy` + `HumanoStrategy`, `HobbitStrategy`, `EnanoStrategy`, `ElfoStrategy` |
+| **Simple Factory** | `CharacterFactory.getStrategy(tipoRaza)` |
+| **Singleton** | `DatabaseConnection` (conexión JDBC única) |
+| **Repository** | `IPersonajeRepository` + `MysqlPersonajeRepository` |
+
+## Endpoints REST
+
+### `GET /hello`
+
+Health check básico.
+
+```
+GET http://localhost:9091/hello?name=Mundo
+Response: Hello Mundo!
+```
+
+### `GET /personajes`
+
+Lista todos los personajes en la BD.
+
+```
+GET http://localhost:9091/personajes
+Response: [ { "nombre": "...", "tipoRaza": "...", ... } ]
+```
+
+### `POST /generar`
+
+Crea un nuevo personaje.
+
+```
+POST http://localhost:9091/generar
+Content-Type: application/json
+
+Body: { "nombre": "Frodo", "raza": "HOBBIT" }
+
+Response: {
+  "nombre": "Frodo",
+  "tipoRaza": "HOBBIT",
+  "atributos": { "fuerza": 10, "agilidad": 10, "sigilo": 25, "valor": 20 },
+  "habilidadEspecial": "Resistencia a la Sombra"
+}
+```
+
+Razas válidas: `HOBBIT`, `ELFO`, `ENANO`, `HUMANO`.
+
+## Frontend
+
+La página principal en `http://localhost:9091` incluye:
+- Formulario para crear personajes (nombre + raza)
+- Tabla con todos los héroes creados
+
+## Bonos por raza
+
+| Raza | Fuerza | Agilidad | Sigilo | Valor | Habilidad especial |
+|---|---|---|---|---|---|
+| Hobbit | 10 | 10 | **+25** | **+20** | Resistencia a la Sombra |
+| Elfo | 10 | **+25** | **+35** | 10 | Agilidad aumentada |
+| Enano | **+35** | 10 | 10 | **+25** | Detección de metales |
+| Humano | 10 | 10 | 10 | **+25** | Incremento de Supervivencia |
+
+Los valores base parten de 10 (definidos en MySQL) y se suman los bonos de raza.
+
+## Tests
+
+```bash
+mvn test
+```
+
+Incluye un test de contexto Spring (`MiddleearthApplicationTests`).

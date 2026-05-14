@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Forja tu Leyenda</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="card">
+        <h1>Forja tu Leyenda</h1>
+        <form id="formPersonaje">
+            <label>Nombre: 
+                <input type="text" id="nombre" required>
+            </label><br><br>
+            <label>Raza: 
+                <select id="raza">
+                    <option value="HOBBIT">Hobbit</option>
+                    <option value="ELFO">Elfo</option>
+                    <option value="ENANO">Enano</option>
+                    <option value="HUMANO">Humano</option>
+                </select>
+            </label><br><br>
+            <button type="submit">Generar Personaje</button>
+        </form>
+    </div>
+
+    <h2>Héroes en la Tierra Media</h2>
+    <div id="mensaje"></div>
+    <table border="1" id="tablaPersonajes">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Raza</th>
+                <th>Habilidad</th>
+                <th>Estrategia</th>
+                <th>Atributos</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla">
+            <tr><td colspan="5">Cargando...</td></tr>
+        </tbody>
+    </table>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
