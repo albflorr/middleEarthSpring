@@ -24,7 +24,6 @@ public class MysqlPersonajeRepository implements IPersonajeRepository {
     public void guardar(Personaje p) {
 String sql = "INSERT INTO personajes (nombre, raza, habilidad_especial,fuerza,agilidad,sigilo,valor) "
         + "VALUES (?, ?,?,?,?,?,?)";
-System.out.println(p.getTipoRaza() + sql);
         try {
             java.sql.Connection conn = DatabaseConnection.getInstance();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
