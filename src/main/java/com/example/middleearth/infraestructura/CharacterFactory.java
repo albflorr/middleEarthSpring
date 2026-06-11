@@ -6,6 +6,7 @@ package com.example.middleearth.infraestructura;
 
 import com.example.middleearth.dominio.ElfoStrategy;
 import com.example.middleearth.dominio.EnanoStrategy;
+import com.example.middleearth.dominio.EntStrategy;
 import com.example.middleearth.dominio.HobbitStrategy;
 import com.example.middleearth.dominio.HumanoStrategy;
 import com.example.middleearth.dominio.RazaStrategy;
@@ -34,6 +35,9 @@ public class CharacterFactory {
             }
             case "HUMANO" -> {
                 return new HumanoStrategy();
+            }
+            case "ENT" -> {
+                return new EntStrategy();
             }
             default -> throw new IllegalArgumentException("Raza de la Tierra Media no reconocida: " + tipoRaza);
         }

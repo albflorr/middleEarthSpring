@@ -19,11 +19,12 @@ public class Personaje {
         return getNombre() + " es un " + getTipoRaza() + atributos.toString();
     }
     
-    public Personaje(String nombre, String tipoRaza, RazaStrategy estrategia) {
+    
+    public Personaje(String nombre, String tipoRaza, RazaStrategy estrategia, Atributos atributos) {
         this.nombre = nombre;
         this.tipoRaza = tipoRaza;
         this.estrategia = estrategia;
-        this.atributos = new Atributos();
+        this.atributos = atributos;
     }
     
     public void aplicarBonosRaza(){

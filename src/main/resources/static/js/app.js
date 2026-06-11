@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:9091';
+const API_BASE = 'http://localhost:9090';
 
 // Cargar lista al iniciar
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,6 +13,11 @@ document.getElementById('formPersonaje').addEventListener('submit', function(e) 
     
     const nombre = document.getElementById('nombre').value.trim();
     const raza = document.getElementById('raza').value;
+    const agilidad = document.getElementById('agilidad').value;
+    const fuerza = document.getElementById('fuerza').value;
+    const sigilo = document.getElementById('sigilo').value;
+    const valor = document.getElementById('valor').value;
+
     
     mostrarMensaje('Generando personaje...', 'info');
     
@@ -23,7 +28,11 @@ document.getElementById('formPersonaje').addEventListener('submit', function(e) 
         },
         body: JSON.stringify({ 
             nombre: nombre, 
-            raza: raza 
+            raza: raza,
+            agilidad: agilidad,
+            fuerza:fuerza,
+            sigilo:sigilo,
+            valor:valor
         })
     })
     .then(response => {

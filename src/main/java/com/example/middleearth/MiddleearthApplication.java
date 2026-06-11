@@ -3,6 +3,7 @@ package com.example.middleearth;
 import com.example.middleearth.aplicacion.IPersonajeRepository;
 import com.example.middleearth.aplicacion.PersonajeDTO;
 import com.example.middleearth.aplicacion.PersonajeService;
+import com.example.middleearth.dominio.Atributos;
 import com.example.middleearth.dominio.Personaje;
 import com.example.middleearth.infraestructura.MysqlPersonajeRepository;
 import java.util.List;
@@ -41,7 +42,8 @@ public class MiddleearthApplication {
     public Personaje generarPersonaje(@RequestBody PersonajeDTO request) {
         IPersonajeRepository repositorio = new MysqlPersonajeRepository();
         PersonajeService servicio = new PersonajeService(repositorio);
-        return servicio.crearHeroe(request.getNombre(), request.getRaza());
+        Atributos attr = new Atributos(request.getAgilidad(),request.getFuerza(),request.getSigilo(),request.getValor());
+        return servicio.crearHeroe(request.getNombre(), request.getRaza(),attr);
     }
     
 }

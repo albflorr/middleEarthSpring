@@ -4,6 +4,7 @@
  */
 package com.example.middleearth.aplicacion;
 
+import com.example.middleearth.dominio.Atributos;
 import com.example.middleearth.dominio.Personaje;
 import com.example.middleearth.dominio.RazaStrategy;
 import com.example.middleearth.infraestructura.CharacterFactory;
@@ -21,12 +22,12 @@ public class PersonajeService {
         this.repository = repository;
     }
 
-    public Personaje crearHeroe(String nombre, String tipoRaza) {
+    public Personaje crearHeroe(String nombre, String tipoRaza, Atributos attr) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new RuntimeException("El nombre del héroe es obligatorio.");
         }
         RazaStrategy estrategia = CharacterFactory.getStrategy(tipoRaza);
-        Personaje nuevoHeroe = new Personaje(nombre, tipoRaza, estrategia);
+        Personaje nuevoHeroe = new Personaje(nombre, tipoRaza, estrategia, attr);
         nuevoHeroe.aplicarBonosRaza();
         repository.guardar(nuevoHeroe);
      

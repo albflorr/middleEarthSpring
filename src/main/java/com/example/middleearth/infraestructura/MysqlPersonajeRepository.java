@@ -5,6 +5,7 @@
 package com.example.middleearth.infraestructura;
 
 import com.example.middleearth.aplicacion.IPersonajeRepository;
+import com.example.middleearth.dominio.Atributos;
 import com.example.middleearth.dominio.Personaje;
 import com.example.middleearth.dominio.RazaStrategy;
 import java.sql.PreparedStatement;
@@ -56,16 +57,18 @@ String sql = "INSERT INTO personajes (nombre, raza, habilidad_especial,fuerza,ag
                 while (rs.next()) {
                     String nombre = rs.getString("nombre");
                     String raza = rs.getString("raza");
-
+                    
                     if (raza == null || raza.isBlank()) continue;
 
                     int fuerza = rs.getInt("fuerza");
                     int agilidad = rs.getInt("agilidad");
                     int sigilo = rs.getInt("sigilo");
                     int valor = rs.getInt("valor");
+                    
+                    Atributos attr = new Atributos(agilidad,fuerza,sigilo,valor);
 
                     RazaStrategy estrategia = CharacterFactory.getStrategy(raza);
-                    Personaje p = new Personaje(nombre, raza, estrategia);
+                    Personaje p = new Personaje(nombre, raza, estrategia,attr);
                     p.getAtributos().setFuerza(fuerza);
                     p.getAtributos().setAgilidad(agilidad);
                     p.getAtributos().setSigilo(sigilo);

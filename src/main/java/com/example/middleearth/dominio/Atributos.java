@@ -13,6 +13,17 @@ public class Atributos {
     private int agilidad;
     private int sigilo;
     private int valor;
+
+    public Atributos(int fuerza, int agilidad, int sigilo, int valor) {
+        this.fuerza = fuerza;
+        this.agilidad = agilidad;
+        this.sigilo = sigilo;
+        this.valor = valor;
+    }
+
+    public Atributos() {
+    }
+    
     
     
     @Override
