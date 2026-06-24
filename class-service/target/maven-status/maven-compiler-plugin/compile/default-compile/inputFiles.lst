@@ -1,0 +1,11 @@
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\application\port\input\ClassUseCase.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\application\port\output\ClassRepository.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\application\service\DndClassApplicationService.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\DndClassServiceApplication.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\domain\model\ClassFeature.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\domain\model\DndClass.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\infrastructure\adapter\inbound\ClassRestController.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\infrastructure\adapter\outbound\DndClassJpaRepository.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\infrastructure\adapter\outbound\JpaClassRepositoryAdapter.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\infrastructure\config\BeanConfig.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\class-service\src\main\java\com\dnd\dndclass\infrastructure\config\CorsConfig.java

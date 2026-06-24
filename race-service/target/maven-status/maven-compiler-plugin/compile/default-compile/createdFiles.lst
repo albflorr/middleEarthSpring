@@ -1,0 +1,12 @@
+com\dnd\race\application\service\RaceApplicationService.class
+com\dnd\race\infrastructure\adapter\outbound\JpaRaceRepositoryAdapter.class
+com\dnd\race\domain\model\Race.class
+com\dnd\race\domain\model\AbilityScoreIncrease.class
+com\dnd\race\infrastructure\adapter\outbound\RaceJpaRepository.class
+com\dnd\race\infrastructure\config\CorsConfig.class
+com\dnd\race\RaceServiceApplication.class
+com\dnd\race\application\port\output\RaceRepository.class
+com\dnd\race\infrastructure\adapter\inbound\RaceRestController.class
+com\dnd\race\infrastructure\config\CorsConfig$1.class
+com\dnd\race\application\port\input\RaceUseCase.class
+com\dnd\race\infrastructure\config\BeanConfig.class

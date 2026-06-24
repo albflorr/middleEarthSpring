@@ -1,0 +1,12 @@
+com\dnd\dndclass\application\service\DndClassApplicationService.class
+com\dnd\dndclass\infrastructure\adapter\outbound\JpaClassRepositoryAdapter.class
+com\dnd\dndclass\infrastructure\config\BeanConfig.class
+com\dnd\dndclass\application\port\input\ClassUseCase.class
+com\dnd\dndclass\domain\model\ClassFeature.class
+com\dnd\dndclass\DndClassServiceApplication.class
+com\dnd\dndclass\application\port\output\ClassRepository.class
+com\dnd\dndclass\domain\model\DndClass.class
+com\dnd\dndclass\infrastructure\config\CorsConfig.class
+com\dnd\dndclass\infrastructure\adapter\outbound\DndClassJpaRepository.class
+com\dnd\dndclass\infrastructure\adapter\inbound\ClassRestController.class
+com\dnd\dndclass\infrastructure\config\CorsConfig$1.class

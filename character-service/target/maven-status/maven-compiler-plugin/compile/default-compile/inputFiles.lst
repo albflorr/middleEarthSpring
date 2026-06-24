@@ -1,0 +1,15 @@
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\application\port\input\CreateCharacterUseCase.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\application\port\input\GetCharacterUseCase.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\application\port\output\CharacterRepository.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\application\port\output\ClassServicePort.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\application\port\output\RaceServicePort.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\application\service\CharacterApplicationService.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\CharacterServiceApplication.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\domain\model\Abilities.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\domain\model\DnDCharacter.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\domain\service\AbilityGenerator.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\infrastructure\adapter\inbound\CharacterRestController.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\infrastructure\adapter\outbound\CharacterJpaRepository.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\infrastructure\adapter\outbound\JpaCharacterRepositoryAdapter.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\infrastructure\config\BeanConfig.java
+C:\Users\USER\Documents\NetBeansProjects\middleEarthSpring_JPA\character-service\src\main\java\com\dnd\character\infrastructure\config\CorsConfig.java

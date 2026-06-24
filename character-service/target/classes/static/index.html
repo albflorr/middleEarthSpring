@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D&D Character Generator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+h1 { text-align: center; color: #e94560; margin-bottom: 20px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; justify-content: center; }
+.tab { padding: 10px 24px; background: #16213e; border: none; color: #aaa; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 16px; }
+.tab.active { background: #0f3460; color: #e94560; font-weight: bold; }
+.tab:hover { background: #1a3a6a; }
+.tab-content { display: none; background: #16213e; padding: 20px; border-radius: 0 8px 8px 8px; min-height: 400px; }
+.tab-content.active { display: block; }
+h2 { color: #e94560; margin-bottom: 16px; }
+h3 { color: #0f3460; margin: 12px 0 8px; }
+form { background: #0f3460; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.form-group { flex: 1; min-width: 150px; }
+label { display: block; font-size: 13px; color: #aaa; margin-bottom: 4px; }
+input, select, textarea { width: 100%; padding: 8px 10px; background: #1a1a2e; border: 1px solid #333; color: #e0e0e0; border-radius: 4px; font-size: 14px; }
+textarea { resize: vertical; }
+button { padding: 8px 20px; background: #e94560; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; }
+button:hover { background: #d63851; }
+button.secondary { background: #0f3460; }
+button.secondary:hover { background: #1a4a8a; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #333; font-size: 14px; }
+th { background: #0f3460; color: #e94560; }
+tr:hover { background: #1a3a6a; }
+.abilities-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 12px 0; }
+.ability-card { background: #0f3460; padding: 12px; border-radius: 6px; text-align: center; }
+.ability-card .label { font-size: 12px; color: #aaa; text-transform: uppercase; }
+.ability-card .value { font-size: 28px; font-weight: bold; color: #e94560; }
+.ability-card .mod { font-size: 14px; color: #4ecca3; }
+.status { padding: 10px 16px; border-radius: 6px; margin: 10px 0; display: none; }
+.status.success { display: block; background: #1b4332; border: 1px solid #2d6a4f; color: #95d5b2; }
+.status.error { display: block; background: #4a0e0e; border: 1px solid #8b1a1a; color: #f5a5a5; }
+.loading { text-align: center; padding: 20px; color: #aaa; }
+.empty { text-align: center; padding: 30px; color: #555; }
+</style>
+</head>
+<body>
+<h1>D&D 5e Character Generator</h1>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('races')">Races</button>
+  <button class="tab" onclick="switchTab('classes')">Classes</button>
+  <button class="tab" onclick="switchTab('characters')">Characters</button>
+</div>
+
+<div id="tab-races" class="tab-content active">
+  <h2>Races</h2>
+  <form id="raceForm" onsubmit="createRace(event)">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name</label>
+        <input name="name" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input name="description" required>
+      </div>
+      <div class="form-group">
+        <label>Traits</label>
+        <input name="traits" placeholder="comma separated">
+      </div>
+    </div>
+    <div class="abilities-grid" style="margin-top:12px">
+      <div class="form-group"><label>Str Bonus</label><input name="strengthBonus" type="number" value="0"></div>
+      <div class="form-group"><label>Dex Bonus</label><input name="dexterityBonus" type="number" value="0"></div>
+      <div class="form-group"><label>Con Bonus</label><input name="constitutionBonus" type="number" value="0"></div>
+      <div class="form-group"><label>Int Bonus</label><input name="intelligenceBonus" type="number" value="0"></div>
+      <div class="form-group"><label>Wis Bonus</label><input name="wisdomBonus" type="number" value="0"></div>
+      <div class="form-group"><label>Cha Bonus</label><input name="charismaBonus" type="number" value="0"></div>
+    </div>
+    <button type="submit" style="margin-top:12px">Create Race</button>
+  </form>
+  <div id="raceStatus" class="status"></div>
+  <div id="raceList"></div>
+</div>
+
+<div id="tab-classes" class="tab-content">
+  <h2>Classes</h2>
+  <form id="classForm" onsubmit="createClass(event)">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name</label>
+        <input name="name" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input name="description" required>
+      </div>
+      <div class="form-group">
+        <label>Hit Die (d8, d10, etc)</label>
+        <input name="hitDie" type="number" value="8" required>
+      </div>
+      <div class="form-group">
+        <label>Primary Ability</label>
+        <input name="primaryAbility" placeholder="Strength" required>
+      </div>
+      <div class="form-group">
+        <label>Saving Throws</label>
+        <input name="savingThrows" placeholder="Str, Con">
+      </div>
+    </div>
+    <button type="submit" style="margin-top:12px">Create Class</button>
+  </form>
+  <div id="classStatus" class="status"></div>
+  <div id="classList"></div>
+</div>
+
+<div id="tab-characters" class="tab-content">
+  <h2>Create Character</h2>
+  <form id="characterForm" onsubmit="createCharacter(event)">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name</label>
+        <input name="name" required>
+      </div>
+      <div class="form-group">
+        <label>Race</label>
+        <select name="race" required><option value="">Select race...</option></select>
+      </div>
+      <div class="form-group">
+        <label>Class</label>
+        <select name="className" required><option value="">Select class...</option></select>
+      </div>
+      <div class="form-group">
+        <label>Method</label>
+        <select name="method">
+          <option value="standard">Standard Array</option>
+          <option value="rolled">Rolled (4d6 drop lowest)</option>
+        </select>
+      </div>
+      <div class="form-group" style="display:flex;align-items:end">
+        <button type="submit">Generate!</button>
+      </div>
+    </div>
+  </form>
+  <div id="characterStatus" class="status"></div>
+  <div id="lastCharacter"></div>
+  <div id="characterList" style="margin-top:24px">
+    <h2>Characters</h2>
+    <div id="charactersTable"></div>
+  </div>
+</div>
+
+<script>
+const RACE_SERVICE = 'http://localhost:8082';
+const CLASS_SERVICE = 'http://localhost:8083';
+const CHAR_SERVICE = 'http://localhost:8081';
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[onclick*="${name}"]`).classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+async function api(url, options = {}) {
+  const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// ======= RACES =======
+async function loadRaces() {
+  const el = document.getElementById('raceList');
+  el.innerHTML = '<div class="loading">Loading races...</div>';
+  try {
+    const races = await api(`${RACE_SERVICE}/api/races`);
+    if (!races.length) { el.innerHTML = '<div class="empty">No races created yet</div>'; return; }
+    let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Str</th><th>Dex</th><th>Con</th><th>Int</th><th>Wis</th><th>Cha</th><th>Traits</th></tr></thead><tbody>';
+    races.forEach(r => {
+      html += `<tr><td>${r.id}</td><td>${r.name}</td><td>${r.strengthBonus}</td><td>${r.dexterityBonus}</td><td>${r.constitutionBonus}</td><td>${r.intelligenceBonus}</td><td>${r.wisdomBonus}</td><td>${r.charismaBonus}</td><td>${r.traits || ''}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = `<div class="status error">Error loading races: ${e.message}</div>`;
+  }
+}
+
+async function createRace(e) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  data.strengthBonus = parseInt(data.strengthBonus) || 0;
+  data.dexterityBonus = parseInt(data.dexterityBonus) || 0;
+  data.constitutionBonus = parseInt(data.constitutionBonus) || 0;
+  data.intelligenceBonus = parseInt(data.intelligenceBonus) || 0;
+  data.wisdomBonus = parseInt(data.wisdomBonus) || 0;
+  data.charismaBonus = parseInt(data.charismaBonus) || 0;
+  const status = document.getElementById('raceStatus');
+  try {
+    await api(`${RACE_SERVICE}/api/races`, { method: 'POST', body: JSON.stringify(data) });
+    status.className = 'status success';
+    status.textContent = 'Race created!';
+    e.target.reset();
+    loadRaces();
+    loadRaceDropdown();
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function loadRaceDropdown() {
+  try {
+    const races = await api(`${RACE_SERVICE}/api/races`);
+    const sel = document.querySelector('select[name="race"]');
+    sel.innerHTML = '<option value="">Select race...</option>' + races.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+  } catch (e) { /* ignore */ }
+}
+
+// ======= CLASSES =======
+async function loadClasses() {
+  const el = document.getElementById('classList');
+  el.innerHTML = '<div class="loading">Loading classes...</div>';
+  try {
+    const classes = await api(`${CLASS_SERVICE}/api/classes`);
+    if (!classes.length) { el.innerHTML = '<div class="empty">No classes created yet</div>'; return; }
+    let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Hit Die</th><th>Primary Ability</th><th>Saving Throws</th></tr></thead><tbody>';
+    classes.forEach(c => {
+      html += `<tr><td>${c.id}</td><td>${c.name}</td><td>d${c.hitDie}</td><td>${c.primaryAbility}</td><td>${c.savingThrows || ''}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = `<div class="status error">Error loading classes: ${e.message}</div>`;
+  }
+}
+
+async function createClass(e) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  data.hitDie = parseInt(data.hitDie) || 8;
+  const status = document.getElementById('classStatus');
+  try {
+    await api(`${CLASS_SERVICE}/api/classes`, { method: 'POST', body: JSON.stringify(data) });
+    status.className = 'status success';
+    status.textContent = 'Class created!';
+    e.target.reset();
+    loadClasses();
+    loadClassDropdown();
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function loadClassDropdown() {
+  try {
+    const classes = await api(`${CLASS_SERVICE}/api/classes`);
+    const sel = document.querySelector('select[name="className"]');
+    sel.innerHTML = '<option value="">Select class...</option>' + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  } catch (e) { /* ignore */ }
+}
+
+// ======= CHARACTERS =======
+async function createCharacter(e) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  const status = document.getElementById('characterStatus');
+  status.className = 'status';
+  try {
+    const char = await api(`${CHAR_SERVICE}/api/characters`, { method: 'POST', body: JSON.stringify(data) });
+    status.className = 'status success';
+    status.textContent = 'Character created!';
+    showCharacter(char);
+    loadCharacters();
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+function showCharacter(c) {
+  const abils = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+  const vals = [c.strength, c.dexterity, c.constitution, c.intelligence, c.wisdom, c.charisma];
+  let cards = '<div class="abilities-grid">';
+  abils.forEach((a, i) => {
+    const mod = Math.floor((vals[i] - 10) / 2);
+    const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
+    cards += `<div class="ability-card"><div class="label">${a}</div><div class="value">${vals[i]}</div><div class="mod">${modStr}</div></div>`;
+  });
+  cards += '</div>';
+
+  document.getElementById('lastCharacter').innerHTML = `
+    <h3>${c.name} (${c.raceName} ${c.className})</h3>
+    <p>Level ${c.level} | Background: ${c.background || 'N/A'}</p>
+    ${cards}
+  `;
+}
+
+async function loadCharacters() {
+  const el = document.getElementById('charactersTable');
+  el.innerHTML = '<div class="loading">Loading characters...</div>';
+  try {
+    const chars = await api(`${CHAR_SERVICE}/api/characters`);
+    if (!chars.length) { el.innerHTML = '<div class="empty">No characters created yet</div>'; return; }
+    let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Race</th><th>Class</th><th>Level</th><th>Str</th><th>Dex</th><th>Con</th><th>Int</th><th>Wis</th><th>Cha</th></tr></thead><tbody>';
+    chars.forEach(c => {
+      html += `<tr><td>${c.id}</td><td>${c.name}</td><td>${c.raceName}</td><td>${c.className}</td><td>${c.level}</td><td>${c.strength}</td><td>${c.dexterity}</td><td>${c.constitution}</td><td>${c.intelligence}</td><td>${c.wisdom}</td><td>${c.charisma}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = `<div class="status error">Error loading characters: ${e.message}</div>`;
+  }
+}
+
+// ======= INIT =======
+loadRaces();
+loadClasses();
+loadCharacters();
+loadRaceDropdown();
+loadClassDropdown();
+</script>
+</body>
+</html>

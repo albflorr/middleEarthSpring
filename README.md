@@ -1,169 +1,161 @@
-# Middle Earth - Forja tu Leyenda
+    # D&D 5e Character Generator
 
-Aplicación Spring Boot para crear y gestionar héroes de la Tierra Media, con bonos de atributos según su raza.
+Generador de personajes de **Dungeons & Dragons 5ª edición (2024)** con 3 microservicios independientes, arquitectura hexagonal y Spring Boot 3.4.1.
 
-## Stack tecnológico
+## Stack tecnológico ST
 
 | Componente | Versión |
 |---|---|
 | Java | 17 |
-| Spring Boot | 4.0.6 |
-| MySQL | 8+ (connector mysql-connector-j) |
+| Spring Boot | 3.4.1 |
+| Spring Data JPA | Hibernate 6 |
+| MySQL | 8+ (mysql-connector-j) |
 | Frontend | HTML + CSS + JS vanilla |
-| Build | Maven |
-
-## Requisitos previos
-
-- JDK 17
-- MySQL 8+ corriendo en `localhost:3306`
-- Maven (incluido en NetBeans o instalado por separado)
-
-## Base de datos
-
-Crear la base de datos y tabla:
-
-```sql
-CREATE DATABASE lotr_db;
-
-USE lotr_db;
-
-CREATE TABLE personajes (
-    id BIGINT(20) NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(255) NOT NULL,
-    raza VARCHAR(50) NOT NULL,
-    tipo_raza VARCHAR(255) NOT NULL,
-    habilidad_especial VARCHAR(255),
-    fuerza INT(11) DEFAULT 10,
-    agilidad INT(11) DEFAULT 10,
-    sigilo INT(11) DEFAULT 10,
-    valor INT(11) DEFAULT 10,
-    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
-```
-
-## Configuración
-
-`src/main/resources/application.properties`:
-
-```properties
-server.port=9091
-spring.application.name=middleearth
-spring.datasource.url=jdbc:mysql://localhost:3306/lotr_db
-spring.datasource.username=root
-spring.datasource.password=
-```
-
-Ajusta usuario/contraseña según tu MySQL.
-
-## Ejecución
-
-```bash
-# Desde NetBeans: botón Run (play)
-# O desde terminal:
-mvn spring-boot:run
-```
-
-La aplicación arranca en `http://localhost:9091`.
+| Build | Maven multi-módulo |
 
 ## Arquitectura
 
 ```
-src/main/java/com/example/middleearth/
-├── MiddleearthApplication.java     # Main + REST Controller
-├── aplicacion/                     # Casos de uso (servicios)
-│   ├── IPersonajeRepository.java   # Puerto de salida (interfaz repositorio)
-│   ├── PersonajeService.java       # Servicio: crear y listar héroes
-│   └── PersonajeDTO.java           # DTO para petición POST
-├── dominio/                        # Núcleo del negocio
-│   ├── Personaje.java              # Entidad personaje
-│   ├── Atributos.java              # Value Object (fuerza, agilidad, sigilo, valor)
-│   ├── RazaStrategy.java           # Interface Strategy
-│   ├── HumanoStrategy.java         # +15 Valor
-│   ├── HobbitStrategy.java         # +15 Sigilo, +10 Valor
-│   ├── EnanoStrategy.java          # +15 Valor, +25 Fuerza
-│   └── ElfoStrategy.java           # +25 Sigilo, +15 Agilidad
-└── infraestructura/                # Adaptadores técnicos
-    ├── CharacterFactory.java       # Simple Factory (crea RazaStrategy según raza)
-    ├── DatabaseConnection.java     # Singleton de conexión JDBC
-    └── MysqlPersonajeRepository.java # Implementación del repositorio (JDBC puro)
-
-src/main/resources/static/
-├── index.html                      # Página principal
-├── css/style.css                   # Estilos
-└── js/app.js                       # JS cliente (fetch API)
+middleEarthSpring_JPA/
+├── pom.xml                          # POM padre multi-módulo
+├── shared/                          # DTOs compartidos (JAR, no ejecutable)
+├── character-service/               # Microservicio principal (puerto 8081)
+├── race-service/                    # Microservicio de razas (puerto 8082)
+└── class-service/                   # Microservicio de clases (puerto 8083)
 ```
 
-### Patrones de diseño
-
-| Patrón | Implementación |
-|---|---|
-| **Strategy** | `RazaStrategy` + `HumanoStrategy`, `HobbitStrategy`, `EnanoStrategy`, `ElfoStrategy` |
-| **Simple Factory** | `CharacterFactory.getStrategy(tipoRaza)` |
-| **Singleton** | `DatabaseConnection` (conexión JDBC única) |
-| **Repository** | `IPersonajeRepository` + `MysqlPersonajeRepository` |
-
-## Endpoints REST
-
-### `GET /hello`
-
-Health check básico.
+Cada microservicio sigue **Arquitectura Hexagonal (Ports & Adapters)**:
 
 ```
-GET http://localhost:9091/hello?name=Mundo
-Response: Hello Mundo!
+┌─────────────────────────────────────────┐
+│  Infrastructure                          │
+│  ┌───────────────────────────────────┐   │
+│  │  Application                      │   │
+│  │  ┌─────────────────────────────┐   │   │
+│  │  │  Domain                     │   │   │
+│  │  │  (entities, value objects)   │   │   │
+│  │  └─────────────────────────────┘   │   │
+│  │  ┌──────────┐  ┌───────────────┐   │   │
+│  │  │  Input   │  │ Output Ports   │   │   │
+│  │  │  Ports   │  │ (interfaces)   │   │   │
+│  │  └──────────┘  └───────────────┘   │   │
+│  └───────────────────────────────────┘   │
+│  ┌──────────────┐  ┌─────────────────┐   │
+│  │  Controllers  │  │ JPA / HTTP      │   │
+│  └──────────────┘  └─────────────────┘   │
+└─────────────────────────────────────────┘
 ```
 
-### `GET /personajes`
-
-Lista todos los personajes en la BD.
+### Comunicación inter-servicios
 
 ```
-GET http://localhost:9091/personajes
-Response: [ { "nombre": "...", "tipoRaza": "...", ... } ]
+character-service (8081) ──HTTP──▶ race-service (8082)  GET /api/races/name/{name}
+character-service (8081) ──HTTP──▶ class-service (8083) GET /api/classes/name/{name}
 ```
 
-### `POST /generar`
+## Bases de datos
 
-Crea un nuevo personaje.
+Se requieren 3 bases de datos MySQL independientes:
 
-```
-POST http://localhost:9091/generar
-Content-Type: application/json
-
-Body: { "nombre": "Frodo", "raza": "HOBBIT" }
-
-Response: {
-  "nombre": "Frodo",
-  "tipoRaza": "HOBBIT",
-  "atributos": { "fuerza": 10, "agilidad": 10, "sigilo": 25, "valor": 20 },
-  "habilidadEspecial": "Resistencia a la Sombra"
-}
+```sql
+CREATE DATABASE dnd_character_db;
+CREATE DATABASE dnd_race_db;
+CREATE DATABASE dnd_class_db;
 ```
 
-Razas válidas: `HOBBIT`, `ELFO`, `ENANO`, `HUMANO`.
+JPA crea las tablas automáticamente con `spring.jpa.hibernate.ddl-auto=update`.
+
+## Microservicios
+
+### character-service (puerto 8081)
+
+Obtiene raza y clase vía HTTP, genera estadísticas (Standard Array o 4d6 drop lowest), aplica bonuses raciales y persiste el personaje.
+
+| Método | Endpoint | Body | Descripción |
+|--------|----------|------|-------------|
+| `POST` | `/api/characters` | `{"name":"Gimli","race":"Dwarf","className":"Fighter","method":"standard"}` | Crear personaje |
+| `GET` | `/api/characters` | - | Listar personajes |
+| `GET` | `/api/characters/{id}` | - | Obtener por ID |
+
+**Métodos de generación:**
+- `standard` — Baraja `[15, 14, 13, 12, 10, 8]` aleatoriamente
+- `rolled` — 4d6 descartando el menor, 6 veces
+
+### race-service (puerto 8082)
+
+CRUD de razas con bonuses de habilidad (STR, DEX, CON, INT, WIS, CHA).
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/api/races` | Crear raza |
+| `GET` | `/api/races` | Listar razas |
+| `GET` | `/api/races/{id}` | Obtener por ID |
+| `GET` | `/api/races/name/{name}` | Obtener por nombre |
+
+**Razas incluidas:** Dwarf, Elf, Halfling, Human, Dragonborn, Gnome, Half-Elf, Half-Orc, Tiefling.
+
+### class-service (puerto 8083)
+
+CRUD de clases (hit die, primary ability, saving throws).
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/api/classes` | Crear clase |
+| `GET` | `/api/classes` | Listar clases |
+| `GET` | `/api/classes/{id}` | Obtener por ID |
+| `GET` | `/api/classes/name/{name}` | Obtener por nombre |
+
+**Clases incluidas:** Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard.
 
 ## Frontend
 
-La página principal en `http://localhost:9091` incluye:
-- Formulario para crear personajes (nombre + raza)
-- Tabla con todos los héroes creados
+Interface web en `http://localhost:8081` con 3 pestañas:
+- **Races** — Crear y listar razas
+- **Classes** — Crear y listar clases
+- **Characters** — Generar personajes seleccionando raza/clase y método
 
-## Bonos por raza
+## Requisitos previos
 
-| Raza | Fuerza | Agilidad | Sigilo | Valor | Habilidad especial |
-|---|---|---|---|---|---|
-| Hobbit | 10 | 10 | **+25** | **+20** | Resistencia a la Sombra |
-| Elfo | 10 | **+25** | **+35** | 10 | Agilidad aumentada |
-| Enano | **+35** | 10 | 10 | **+25** | Detección de metales |
-| Humano | 10 | 10 | 10 | **+25** | Incremento de Supervivencia |
+- JDK 17
+- MySQL 8+ en `localhost:3306`
+- Maven
 
-Los valores base parten de 10 (definidos en MySQL) y se suman los bonos de raza.
+## Ejecución
+
+```bash
+# Compilar todo
+mvn clean install -DskipTests
+
+# Iniciar servicios (3 terminales separadas, en este orden):
+cd race-service       && mvn spring-boot:run   # Puerto 8082
+cd class-service      && mvn spring-boot:run   # Puerto 8083
+cd character-service  && mvn spring-boot:run   # Puerto 8081
+
+# Abrir navegador en http://localhost:8081
+```
+
+### Poblar datos iniciales
+
+```bash
+# Razas
+curl -X POST http://localhost:8082/api/races -H "Content-Type: application/json" -d "{\"name\":\"Dwarf\",\"description\":\"Hardy folk\",\"strengthBonus\":2,\"dexterityBonus\":0,\"constitutionBonus\":2,\"intelligenceBonus\":0,\"wisdomBonus\":0,\"charismaBonus\":0,\"traits\":\"Darkvision, Dwarven Resilience\"}"
+
+curl -X POST http://localhost:8082/api/races -H "Content-Type: application/json" -d "{\"name\":\"Human\",\"description\":\"Adaptable\",\"strengthBonus\":1,\"dexterityBonus\":1,\"constitutionBonus\":1,\"intelligenceBonus\":1,\"wisdomBonus\":1,\"charismaBonus\":1,\"traits\":\"Skillful, Versatile\"}"
+
+# Clases
+curl -X POST http://localhost:8083/api/classes -H "Content-Type: application/json" -d "{\"name\":\"Fighter\",\"description\":\"Master of combat\",\"hitDie\":10,\"primaryAbility\":\"Strength\",\"savingThrows\":\"STR, CON\"}"
+
+# Personaje de prueba
+curl -X POST http://localhost:8081/api/characters -H "Content-Type: application/json" -d "{\"name\":\"Gimli\",\"race\":\"Dwarf\",\"className\":\"Fighter\",\"method\":\"standard\"}"
+```
 
 ## Tests
 
 ```bash
-mvn test
+mvn test -pl character-service
 ```
 
-Incluye un test de contexto Spring (`MiddleearthApplicationTests`).
+## Documentación adicional
+
+- `guia.md` — Guía de transformación del monolito original a microservicios
+- `GUIA_CLASES.md` — Paso a paso para replicar el proyecto en clases
